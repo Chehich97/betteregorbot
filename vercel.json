@@ -6,7 +6,10 @@
       "use": "@vercel/python"
     }
   ],
-  "env": {
-    "PYTHON_VERSION": "3.11"
-  }
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/main.py"
+    }
+  ]
 }
