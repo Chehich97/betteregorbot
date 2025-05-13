@@ -1,15 +1,12 @@
-import asyncio
 import logging
 import random
-from aiogram import Bot, Dispatcher, types
-from aiogram.filters import CommandStart, Command
-from aiogram.methods import DeleteWebhook
-from aiogram.types import Message
 import os
 import requests
+from aiogram import Bot, Dispatcher, types
+from aiogram.types import Update
+from aiohttp import web
 
-
-TOKEN = '7864799152:AAFlvHkSkK2Sap5_9B0G_ITltfvm2MbNVZY'  # Ваш токен
+TOKEN = '7864799152:AAFlvHkSkK2Sap5_9B0G_ITltfvm2MbNVZY'  # Ваш токен сосал
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(TOKEN)
@@ -17,7 +14,7 @@ dp = Dispatcher()
 
 # ID пользователя, на сообщения которого будет реагировать бот
 TARGET_EGOR_ID = 484494756
-RESPONSE_PROBABILITY_INSULT = 0.1
+RESPONSE_PROBABILITY_INSULT = 0.05
 TARGET_KLIM_ID = 648321861
 GIF_URL = "https://media1.tenor.com/m/Ws2SCL9HpZUAAAAd/ah-here-you-are-phoebe-dynevor.gif"
 RESPONSE_PROBABILITY_GIF = 0.99
@@ -106,10 +103,11 @@ async def handle_message(message: types.Message):
         await message.answer(f"Произошла неожиданная ошибка: {e}")
 
 
-async def main():
-    await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot)
+async def on_start(request):
+    data = await request.json()
+    update = Update(**data)
+    await dp.process_update(update)
+    return web.Response()
 
-
-if __name__ == "__main__":
-    asyncio.run(main())
+app = web.Application()
+app.router.add_post(f'/{TOKEN}', on_start)
